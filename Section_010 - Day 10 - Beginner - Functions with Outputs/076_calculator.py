@@ -1,4 +1,3 @@
-```python
 """
 ===========================================================
  ROBUST TERMINAL BASED ADVANCED CALCULATOR
@@ -32,7 +31,7 @@ def clear_screen():
     try:
         os.system("cls" if os.name == "nt" else "clear")
     except Exception:
-        pass  # screen clearing failure is non-critical
+        pass  
 
 def pause():
     """Pause execution"""
@@ -265,4 +264,3 @@ while True:
         print("❌ Invalid menu choice.")
 
     pause()
-```
