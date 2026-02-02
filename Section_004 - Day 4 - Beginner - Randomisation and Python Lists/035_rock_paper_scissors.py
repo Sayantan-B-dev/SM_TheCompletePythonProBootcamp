@@ -1,4 +1,3 @@
-```python
 """
 Rock Paper Scissors — Professional CLI Version (ASCII Art)
 
@@ -117,42 +116,3 @@ def main():
 # Program entry point
 if __name__ == "__main__":
     main()
-```
-
-### Example Output (Sample Run)
-
-```text
-=== ROCK PAPER SCISSORS ===
-
-Choose Rock, Paper, or Scissors: rock
-
-You chose:
-
-    _______
----'   ____)
-      (_____)
-      (_____)
-      (____)
----.__(___)
-
-Computer chose:
-
-    _______
----'   ____)____
-          ______)
-       __________)
-      (____)
----.__(___)
-
-Result:
-You win!
-```
-
-### Why this is “professional”
-
-* Functions isolate responsibility (input, logic, output)
-* ASCII art stored centrally (clean, reusable)
-* Defensive input validation
-* Readable rule mapping
-* No magic numbers or hardcoded logic
-* Interview-acceptable CLI design
