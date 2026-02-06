@@ -1,0 +1,47 @@
+
+========================================================================
+LOCATION & SOLAR REPORT
+========================================================================
+
+You are currently located at latitude 22.8664 and
+longitude 88.4011. Based on IP-derived geolocation,
+this corresponds to Bhātpāra, West Bengal,
+IN. Your public IP address is 103.70.210.123,
+and your local timezone is Asia/Kolkata.
+
+------------------------------------------------------------------------
+SOLAR POSITION & DAYLIGHT INFORMATION (UTC)
+------------------------------------------------------------------------
+
+Sunrise:
+Friday, 06 February 2026 at 12:42:27 AM (UTC)
+
+Sunset:
+Friday, 06 February 2026 at 11:58:22 AM (UTC)
+
+Solar Noon:
+Friday, 06 February 2026 at 06:20:25 AM (UTC)
+
+Total Day Length:
+40555
+
+------------------------------------------------------------------------
+TWILIGHT PHASES (UTC)
+------------------------------------------------------------------------
+
+Civil Twilight:
+Friday, 06 February 2026 at 12:20:24 AM (UTC)
+to
+Friday, 06 February 2026 at 12:20:25 PM (UTC)
+
+Nautical Twilight:
+Thursday, 05 February 2026 at 11:53:39 PM (UTC)
+to
+Friday, 06 February 2026 at 12:47:11 PM (UTC)
+
+Astronomical Twilight:
+Thursday, 05 February 2026 at 11:27:07 PM (UTC)
+to
+Friday, 06 February 2026 at 01:13:43 PM (UTC)
+
+========================================================================
