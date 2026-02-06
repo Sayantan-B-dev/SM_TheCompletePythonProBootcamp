@@ -1,0 +1,6 @@
+Hi {name},
+
+Wishing you a very happy birthday 🎉
+May the year ahead be calm, healthy, and fulfilling.
+
+— Birthday Bot
