@@ -1,0 +1,164 @@
+==================================================
+FILE: ./data_manager.py
+==================================================
+import requests
+import os
+from datetime import datetime
+
+class DataManager:
+    """
+    Handles all Google Sheet persistence for flight observations.
+    """
+
+    def __init__(self):
+        self.sheety_base_url = os.getenv("SHEETY_BASE_URL")
+        self.sheety_bearer_token = os.getenv("SHEETY_BEARER_TOKEN")
+
+        if not self.sheety_base_url or not self.sheety_bearer_token:
+            raise RuntimeError("Sheety environment variables missing")
+
+        self.session = requests.Session()
+        self.session.headers.update({
+            "Authorization": f"Bearer {self.sheety_bearer_token}",
+            "Content-Type": "application/json"
+        })
+
+    def get_routes(self):
+        response = self.session.get(self.sheety_base_url)
+        response.raise_for_status()
+
+        # IMPORTANT: resource name must match Sheety response
+        return response.json()["prices"]
+
+    def update_route_observation(self, row_id: int, airline: str, flight_number: str):
+        update_url = f"{self.sheety_base_url}/{row_id}"
+
+        payload = {
+            "price": {
+                "airline": airline,
+                "flightNumber": flight_number,
+                "lastSeenAt": datetime.utcnow().isoformat()
+            }
+        }
+
+        response = self.session.put(update_url, json=payload)
+        response.raise_for_status()
+
+==================================================
+FILE: ./flight_data.py
+==================================================
+class FlightData:
+    """
+    Represents a single observed flight instance.
+    """
+
+    def __init__(
+        self,
+        airline: str,
+        flight_number: str,
+        departure_iata: str,
+        arrival_iata: str
+    ):
+        self.airline = airline
+        self.flight_number = flight_number
+        self.departure_iata = departure_iata
+        self.arrival_iata = arrival_iata
+
+    def __str__(self):
+        return (
+            f"{self.airline} flight {self.flight_number} "
+            f"from {self.departure_iata} to {self.arrival_iata}"
+        )
+
+==================================================
+FILE: ./flight_search.py
+==================================================
+import requests
+import os
+from flight_data import FlightData
+
+class FlightSearch:
+    """
+    Retrieves real flight observations from Aviationstack.
+    """
+
+    def __init__(self):
+        self.api_key = os.getenv("AVIATIONSTACK_API_KEY")
+        self.base_url = "https://api.aviationstack.com/v1"
+
+        if not self.api_key:
+            raise RuntimeError("AVIATIONSTACK_API_KEY missing")
+
+    def observe_route(self, departure_iata: str, arrival_iata: str):
+        params = {
+            "access_key": self.api_key,
+            "dep_iata": departure_iata,
+            "arr_iata": arrival_iata,
+            "limit": 1
+        }
+
+        response = requests.get(f"{self.base_url}/flights", params=params)
+        response.raise_for_status()
+
+        data = response.json().get("data", [])
+        if not data:
+            return None
+
+        flight = data[0]
+
+        return FlightData(
+            airline=flight["airline"]["name"],
+            flight_number=flight["flight"]["iata"],
+            departure_iata=departure_iata,
+            arrival_iata=arrival_iata
+        )
+
+==================================================
+FILE: ./main.py
+==================================================
+from dotenv import load_dotenv
+load_dotenv()
+
+from data_manager import DataManager
+from flight_search import FlightSearch
+from notification_manager import NotificationManager
+
+def main():
+    data_manager = DataManager()
+    flight_search = FlightSearch()
+    notifier = NotificationManager()
+
+    routes = data_manager.get_routes()
+
+    for row in routes:
+        flight = flight_search.observe_route(
+            departure_iata=row["departureIata"],
+            arrival_iata=row["arrivalIata"]
+        )
+
+        if not flight:
+            continue
+
+        data_manager.update_route_observation(
+            row_id=row["id"],
+            airline=flight.airline,
+            flight_number=flight.flight_number
+        )
+
+        notifier.send(str(flight))
+
+if __name__ == "__main__":
+    main()
+
+==================================================
+FILE: ./notification_manager.py
+==================================================
+class NotificationManager:
+    """
+    Outputs observed flight information.
+    """
+
+    def send(self, message: str):
+        print("✈️ Flight Observed")
+        print(message)
+
