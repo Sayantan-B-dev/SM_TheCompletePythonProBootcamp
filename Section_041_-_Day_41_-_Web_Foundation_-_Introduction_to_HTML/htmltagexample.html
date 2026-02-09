@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Comprehensive HTML tag showcase using pure semantic markup">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Elements Showcase</title>
+  <link rel="icon" href="favicon.ico">
+</head>
+<body>
+
+<header>
+  <h1>HTML Semantic and Structural Elements</h1>
+  <p>This document demonstrates extensive usage of HTML elements using meaningful structure.</p>
+  <nav>
+    <ul>
+      <li><a href="#text">Text</a></li>
+      <li><a href="#media">Media</a></li>
+      <li><a href="#forms">Forms</a></li>
+      <li><a href="#tables">Tables</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+<section id="text">
+  <h2>Text and Semantics</h2>
+  <article>
+    <h3>Inline Semantics</h3>
+    <p>
+      This paragraph contains <strong>strong importance</strong>,
+      <em>emphasized text</em>, <mark>highlighted content</mark>,
+      <abbr title="HyperText Markup Language">HTML</abbr>,
+      <code>inlineCode()</code>, <kbd>Ctrl</kbd> + <kbd>C</kbd>,
+      <small>fine print text</small>,
+      <del>removed text</del>, <ins>inserted text</ins>,
+      and <a href="https://example.com">a hyperlink</a>.
+    </p>
+    <blockquote cite="https://example.com">
+      <p>Semantic markup improves accessibility and long term maintainability.</p>
+      <cite>Web Standards Guide</cite>
+    </blockquote>
+  </article>
+
+  <article>
+    <h3>Lists</h3>
+    <p>Unordered list example:</p>
+    <ul>
+      <li>Semantic structure</li>
+      <li>Accessibility</li>
+      <li>SEO friendliness</li>
+    </ul>
+    <p>Ordered list example:</p>
+    <ol>
+      <li>Analyze content</li>
+      <li>Choose correct tags</li>
+      <li>Validate structure</li>
+    </ol>
+    <p>Description list example:</p>
+    <dl>
+      <dt>HTML</dt>
+      <dd>Markup language for structuring web documents</dd>
+      <dt>CSS</dt>
+      <dd>Style sheet language for presentation</dd>
+    </dl>
+  </article>
+</section>
+
+<section id="media">
+  <h2>Media and Embedded Content</h2>
+  <figure>
+    <img src="image.png" alt="Sample placeholder image">
+    <figcaption>Figure caption describing the image context</figcaption>
+  </figure>
+  <audio controls>
+    <source src="audio.mp3" type="audio/mpeg">
+  </audio>
+  <video controls width="320">
+    <source src="video.mp4" type="video/mp4">
+  </video>
+  <iframe src="https://example.com" title="Embedded example site"></iframe>
+  <hr>
+</section>
+
+<section id="tables">
+  <h2>Tabular Data</h2>
+  <table>
+    <caption>Technology Comparison Table</caption>
+    <colgroup>
+      <col>
+      <col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th scope="col">Technology</th>
+        <th scope="col">Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>HTML</td>
+        <td>Structure</td>
+      </tr>
+      <tr>
+        <td>CSS</td>
+        <td>Presentation</td>
+      </tr>
+      <tr>
+        <td>JavaScript</td>
+        <td>Behavior</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2">Core web technologies</td>
+      </tr>
+    </tfoot>
+  </table>
+</section>
+
+<section id="forms">
+  <h2>Forms and User Input</h2>
+  <form action="#" method="post">
+    <fieldset>
+      <legend>User Information</legend>
+
+      <label for="name">Name</label>
+      <input id="name" name="name" type="text" required>
+
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email">
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password">
+
+      <label for="bio">Biography</label>
+      <textarea id="bio" name="bio"></textarea>
+
+      <label for="role">Role</label>
+      <select id="role" name="role">
+        <option value="dev">Developer</option>
+        <option value="designer">Designer</option>
+      </select>
+
+      <label>
+        <input type="checkbox" name="terms">
+        Accept terms
+      </label>
+
+      <button type="submit">Submit</button>
+      <button type="reset">Reset</button>
+    </fieldset>
+  </form>
+</section>
+
+<section>
+  <h2>Interactive and Miscellaneous</h2>
+  <details>
+    <summary>Expandable content section</summary>
+    <p>This content is revealed when the summary is activated.</p>
+  </details>
+  <progress value="70" max="100"></progress>
+  <meter value="0.6">60%</meter>
+  <address>
+    Written by <a href="mailto:user@example.com">Example Author</a><br>
+    Visit us at Example City
+  </address>
+</section>
+
+</main>
+
+<footer>
+  <p>&copy; 2026 Semantic HTML Demonstration</p>
+  <time datetime="2026-01-01">January 1, 2026</time>
+</footer>
+
+</body>
+</html>
