@@ -1,0 +1,1687 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Analytics Dashboard</title>
+
+<style>
+:root {
+    --bg: #0e1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-hover: #79c0ff;
+    --success: #238636;
+    --warning: #daaa3b;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.5;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0 0 20px 0;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.controls {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sort-select {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 180px;
+}
+
+.sort-select:hover {
+    border-color: var(--accent);
+}
+
+.sort-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+}
+
+.sort-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--panel);
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.dashboard {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+thead {
+    background: rgba(22, 27, 34, 0.95);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+th {
+    padding: 16px;
+    text-align: left;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border);
+    user-select: none;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+th:hover {
+    color: var(--accent);
+}
+
+tbody tr {
+    transition: var(--transition);
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: middle;
+    transition: var(--transition);
+}
+
+tbody tr:hover {
+    background: rgba(88, 166, 255, 0.08);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Column specific styles */
+.image {
+    width: 80px;
+    padding: 16px !important;
+}
+
+.image img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: var(--bg);
+    padding: 4px;
+    transition: var(--transition);
+}
+
+.image img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+    font-weight: 600;
+    color: var(--text);
+    min-width: 200px;
+    max-width: 250px;
+}
+
+.subtitle {
+    color: var(--muted);
+    min-width: 300px;
+    max-width: 400px;
+    line-height: 1.4;
+}
+
+.price {
+    font-weight: 600;
+    font-size: 16px;
+    color: #2ea043;
+    min-width: 120px;
+}
+
+.rating {
+    min-width: 120px;
+}
+
+.rating-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: rgba(35, 134, 54, 0.15);
+    border-radius: 6px;
+    color: #2ea043;
+    font-weight: 500;
+}
+
+.sponsored {
+    min-width: 120px;
+}
+
+.sponsored-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.sponsored-yes {
+    background: rgba(218, 170, 59, 0.15);
+    color: var(--warning);
+}
+
+.sponsored-no {
+    background: rgba(35, 134, 54, 0.15);
+    color: var(--success);
+}
+
+.link {
+    min-width: 100px;
+}
+
+.link-button {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--accent);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition);
+    text-align: center;
+    min-width: 70px;
+}
+
+.link-button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+}
+
+/* Sorting indicators */
+.sort-indicator {
+    display: inline-block;
+    margin-left: 4px;
+    transition: var(--transition);
+    opacity: 0;
+}
+
+.sort-asc .sort-indicator {
+    opacity: 1;
+    transform: rotate(180deg);
+}
+
+.sort-desc .sort-indicator {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    body {
+        padding: 16px;
+    }
+    
+    .dashboard {
+        border-radius: 8px;
+    }
+    
+    th, td {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 8px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .sort-select {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+let currentSort = {column: '', direction: 1};
+let rowsData = [];
+
+function initTable() {
+    const tbody = document.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    rowsData = rows.map(row => {
+        return {
+            element: row,
+            price: parseFloat(row.querySelector('.price').dataset.value) || 0,
+            rating: parseFloat(row.querySelector('.rating').dataset.value) || 0,
+            title: row.querySelector('.title').textContent.toLowerCase(),
+            sponsored: parseInt(row.querySelector('.sponsored').dataset.value) || 0
+        };
+    });
+    
+    updateSortInfo();
+}
+
+function sortTable(columnClass) {
+    if (!columnClass) return;
+    
+    // Reset previous sort indicators
+    document.querySelectorAll('th').forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+    });
+    
+    // Set new sort indicator
+    const headerCell = document.querySelector(`th[data-sort="${columnClass}"]`);
+    if (headerCell) {
+        if (currentSort.column === columnClass) {
+            currentSort.direction *= -1;
+        } else {
+            currentSort.column = columnClass;
+            currentSort.direction = 1;
+        }
+        
+        headerCell.classList.add(currentSort.direction === 1 ? 'sort-desc' : 'sort-asc');
+    }
+    
+    const tbody = document.querySelector("tbody");
+    
+    // Animate rows out
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    rows.forEach((row, index) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(-20px)';
+        row.style.transition = 'all 0.3s ease';
+    });
+    
+    // Sort and re-insert rows
+    setTimeout(() => {
+        rows.sort((a, b) => {
+            const aCell = a.querySelector("." + columnClass);
+            const bCell = b.querySelector("." + columnClass);
+            
+            let aVal, bVal;
+            
+            if (columnClass === 'price' || columnClass === 'rating') {
+                aVal = parseFloat(aCell.dataset.value) || 0;
+                bVal = parseFloat(bCell.dataset.value) || 0;
+            } else if (columnClass === 'sponsored') {
+                aVal = parseInt(aCell.dataset.value) || 0;
+                bVal = parseInt(bCell.dataset.value) || 0;
+            } else {
+                aVal = aCell.textContent.toLowerCase();
+                bVal = bCell.textContent.toLowerCase();
+            }
+            
+            if (aVal < bVal) return -1 * currentSort.direction;
+            if (aVal > bVal) return 1 * currentSort.direction;
+            return 0;
+        });
+        
+        // Clear and append sorted rows
+        tbody.innerHTML = '';
+        rows.forEach((row, index) => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(20px)';
+            tbody.appendChild(row);
+            
+            // Animate rows in with staggered delay
+            setTimeout(() => {
+                row.style.opacity = '1';
+                row.style.transform = 'translateX(0)';
+            }, index * 20);
+        });
+        
+        updateSortInfo();
+    }, 300);
+}
+
+function updateSortInfo() {
+    const infoElement = document.getElementById('sortInfo');
+    if (infoElement && currentSort.column) {
+        const columnNames = {
+            'price': 'Price',
+            'rating': 'Rating',
+            'title': 'Brand',
+            'sponsored': 'Sponsored'
+        };
+        
+        const direction = currentSort.direction === 1 ? '↑' : '↓';
+        infoElement.textContent = `Sorted by: ${columnNames[currentSort.column]} ${direction}`;
+        infoElement.style.display = 'flex';
+    } else if (infoElement) {
+        infoElement.style.display = 'none';
+    }
+}
+</script>
+</head>
+
+<body>
+<div class="container">
+    <h1>Amazon Product Analytics Dashboard</h1>
+    
+    <div class="controls">
+        <select class="sort-select" onchange="sortTable(this.value)">
+            <option value="">Sort products by...</option>
+            <option value="price">Price (Low to High)</option>
+            <option value="price">Price (High to Low)</option>
+            <option value="rating">Rating (Best First)</option>
+            <option value="rating">Rating (Worst First)</option>
+            <option value="title">Brand (A-Z)</option>
+            <option value="title">Brand (Z-A)</option>
+            <option value="sponsored">Sponsored First</option>
+            <option value="sponsored">Organic First</option>
+        </select>
+        
+        <div class="sort-info" id="sortInfo" style="display: none;">
+            <span>Sorted by: Price ↑</span>
+        </div>
+    </div>
+    
+    <div class="dashboard">
+        <table>
+            <thead>
+                <tr>
+                    <th data-sort="image">Image</th>
+                    <th data-sort="title" onclick="sortTable('title')" style="cursor: pointer;">
+                        Brand
+                        <span class="sort-indicator">↓</span>
+                    </th>
+                    <th data-sort="subtitle">Description</th>
+                    <th data-sort="price" onclick="sortTable('price')" style="cursor: pointer;">
+                        Price
+                        <span class="sort-indicator">↓</span>
+                    </th>
+                    <th data-sort="rating" onclick="sortTable('rating')" style="cursor: pointer;">
+                        Rating
+                        <span class="sort-indicator">↓</span>
+                    </th>
+                    <th data-sort="sponsored" onclick="sortTable('sponsored')" style="cursor: pointer;">
+                        Sponsored
+                        <span class="sort-indicator">↓</span>
+                    </th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/415F1P7XXAL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Swiss Beauty Pure Matte Creamy Lipstick | Non-drying, Highly pigmented Lipstick | Shade- Café Mocha, 3.8gm|</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="172">₹172</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Swiss-Beauty-Matte-Lipstick-Mocha/dp/B087B49B5G/ref=sr_1_1_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-1-spons&aref=mqHdyNVUak&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/31t--KO2DUL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Lakme Forever Matte Lipstick, Waterproof, Non Drying, Creamy Matte Bullet Lipstick Made With French Rose Oil Extracts, Mauve Envy, 4.5g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="180">₹180</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/LAKMÉ-Cushion-Matte-Lipstick-Finish/dp/B09FKJFBT4/ref=sr_1_2_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-2-spons&aref=CjdL2xzVgG&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/71Bcfw3ecpL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">MARS Matte Muse Mousse Lipstick (3ml) (01-LEADING LADY) with Doe-Foot Applicator | Highly Pigmented | Smooth Texture | Hydrating Formula | Blurry Lips Effect</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="260">₹260</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/MARS-01-LEADING-Applicator-Pigmented-Hydrating/dp/B0DQTLWYYV/ref=sr_1_3_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-3-spons&aref=2zm0wUmhDA&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/71HdsMYrSFL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">MARS Queen of Mattes Lipstick Valentine Gift Items Box Set (3 x 4.5 ml) (PLUMS &amp; MAROONS) | Smudgeproof &amp; Transferproof | Intense Swipe Pigmentation | Long-Lasting Wear</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="407">₹407</td>
+            <td class="rating" data-value="4.4">
+                <span class="rating-value">4.4/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/MARS-MAROONS-Transferproof-Pigmentation-Long-Lasting/dp/B0DSKWSTGP/ref=sr_1_4_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-4-spons&aref=yOwtan0gYS&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/41vn7VglRlL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Blue Heaven Get Matte Lipstick, Long Lasting, Light Weight Lipsticks for Women, Moisturizing Matte Lipstick for Women - 202M, 4g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="94">₹94</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Blue-Heaven-Matte-Lipstick-202M/dp/B0CRZ728JX/ref=sr_1_5?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-5" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51jD170ZkGL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Color Sensational Creamy Matte Lipstick lasts up to 12 Hours, Hydrate Lips, Rich Creamy Lipstick with Shea Butter, Available in 42 Shades - 507 Almond Pink, 3.9g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="193">₹193</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Sensational-Powder-Lipstick-Almond/dp/B078QB5DC7/ref=sr_1_6?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-6" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/6128ANXX0mL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">FACESCANADA Comfy Matte Wow Liquid Lipstick - Cocoa Crush 07, 3.8Ml | One Swipe Application | Highly Pigmented | Comfortable Wear | Glides Smoothly | Long Lasting | Transferproof</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="229">₹229</td>
+            <td class="rating" data-value="4.2">
+                <span class="rating-value">4.2/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/FACES-CANADA-Comfy-Liquid-Lipstick/dp/B0D4F77ZLB/ref=sr_1_7?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-7" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61bQr89dQNL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Blue Heaven Intense Matte Lipstick, Chocolate Swirl,307, 4g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="74">₹74</td>
+            <td class="rating" data-value="3.7">
+                <span class="rating-value">3.7/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Blue-Heaven-Intense-Lipstick-Chocolate/dp/B08M4C8CHN/ref=sr_1_8?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-8" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/511EHhcnpAL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Lakme Powerplay Priming Matte Lipstick, Smooth Matte Finish, Lightweight Lipstick, Smudgeproof, Lasts 16hrs, Hydrates Lips, Pink Party, 3.6g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="253">₹253</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Powerplay-Lipstick-Lightweight-Smudgeproof-Hydrates/dp/B08N828TK7/ref=sr_1_9?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-9" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61VySG3-o9L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">RENEE Very Matte Lipstick - Bare Mocha, Intense Color Pay Off, Full Coverage, Long Lasting &amp; Weightless, Easy Glide Formula With Velvety Finish, Suitable for All Occasion, Ideal For Gifting</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="175">₹175</td>
+            <td class="rating" data-value="3.8">
+                <span class="rating-value">3.8/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/RENEE-Very-Matte-Lipstick-Weightless/dp/B0F4RG6V6J/ref=sr_1_10?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-10" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/41ug4CGFo4L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Serum Lipstick (Satin) 8Hr weightless hydration, One-swipe bold color, Mauve - 103 Make it Work, 4.2g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="500">₹500</td>
+            <td class="rating" data-value="4.9">
+                <span class="rating-value">4.9/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Lipstick-weightless-hydration-One-swipe/dp/B0FPX9J4WR/ref=sr_1_11?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-11" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/71bHgYIdCmL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">MARS Matte Muse Mousse Lipstick (3ml) (09-SUPER STAR) with Doe-Foot Applicator | Highly Pigmented | Smooth Texture | Hydrating Formula | Blurry Lips Effect</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="248">₹248</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/MARS-Lipstick-Applicator-Pigmented-Hydrating/dp/B0DQTQN3NP/ref=sr_1_12?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-12" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/41sXjSVQrbL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Sensational Liquid Matte Lipstick, Non-sticky, Non-drying Lipstick, Hassle-Free &amp; Precise Application, Long-lasting Liquid Matte Lipstick - Nude Nuance|7ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="214">₹214</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Sensational-Liquid-Lipstick-Nuance/dp/B099FNN755/ref=sr_1_13?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-13" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51LE8j5pHYL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Elle 18 Lit Lip, Matte Finish, Nude Pumps, 16 hrs Long Lasting Liquid Lipstick, Smudge and Transfer Proof Lipstick, One-stroke application, Quick Drying | 5.6 ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="112">₹112</td>
+            <td class="rating" data-value="3.9">
+                <span class="rating-value">3.9/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Elle-18-Lipstick-One-stroke-application/dp/B09J197WMZ/ref=sr_1_14?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-14" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61vc8xowYUL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Blue Heaven Matte Love Mini Lipsticks pack of 10 | Long Lasting, Hydrating &amp; Moisturizing Mini Roll on Lipsticks for Women | Soft-Matte Finish | 13g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="255">₹255</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Blue-Heaven-Lipsticks-Hydrating-Moisturizing/dp/B0BX6SHPS8/ref=sr_1_15?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-15" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/41Y-UaMv-rL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Blue Heaven Hyper Stay Weightless Liquid Matte Lipstick | Long-lasting Matte Finish | Non-Transfer Matte Lipstick for Women | Non-Sticky &amp; Smudge Proof | Mystic Maroon-05 | 6ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="108">₹108</td>
+            <td class="rating" data-value="3.8">
+                <span class="rating-value">3.8/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Blue-Heaven-Hyperstay-Matte-Maroon-05/dp/B08WMYMGTB/ref=sr_1_16?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-16" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51Rr4DPmL-L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline High-Glossy New York Superstay Vinyl Ink Liquid Lipstick Lippy Instant Shine &amp; Transfer Proof. Last Up To 16Hr, Enriched With Vitamin E &amp; Aloe | 4.2Ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="466">₹466</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Lipstick-Enriched-Vitamin-SuperStay/dp/B0B9R5F73S/ref=sr_1_17?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-17" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51AePYgKF6L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Lakme Cushion Matte lip MauveLove</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="243">₹243</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/LAKM%C3%89-LEPY100-Lipstick-MauveLove-Matte/dp/B0CJ2J2DNV/ref=sr_1_18?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-18" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51d236Kz3uL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Swiss Beauty Satin Comfort Lipstick | Ultra-Hydrating | Highly Pigmented | Smooth Glide | Satin Matte Finish | One-Swipe Application | Shade- 20 Night Wine, 3gm</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="199">₹199</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Lipstick-Ultra-Hydrating-Pigmented-One-Swipe-Application/dp/B0F7LB2Q5N/ref=sr_1_19?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-19" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51a7uia+rHL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Pilgrim Glitter Lipstick For Women 4.2gm | Dubai Luxe Lifestyle - The Khalifa Shade | Lipstick Infused with Vitamin E &amp; Olive Oil | Glitter Formula With Matte Finish | Non Drying | All Skin Types</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="439">₹439</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Pilgrim-Glitter-Lipstick-Women-Lifestyle/dp/B0DNQ3NWDX/ref=sr_1_20?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-20" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51Ta3nEUgrL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Swiss Beauty Non Tranfer Lipstick Long Stay &amp; Smooth, Royal-Maroon, 3G Matte Finish</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="299">₹299</td>
+            <td class="rating" data-value="3.9">
+                <span class="rating-value">3.9/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Beauty-Tranfer-Lipstick-Smooth-Royal-Maroon/dp/B07T96KW9Y/ref=sr_1_21_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-21-spons&aref=SA6WuxzZ9g&sp_csd=d2lkZ2V0TmFtZT1zcF9tdGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51Io1cY3FEL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Lakme 9 To 5 Primer + Matte Lipstick- Salmon Pink 3.6g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="378">₹378</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/LAKMÉ-Lipstick-Salmon-Pink-All/dp/B0CLRGLLSM/ref=sr_1_22_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-22-spons&aref=3jLVdVvbSM&sp_csd=d2lkZ2V0TmFtZT1zcF9tdGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51Rr4DPmL-L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline High-Glossy New York Superstay Vinyl Ink Liquid Lipstick Lippy Instant Shine &amp; Transfer Proof. Last Up To 16Hr, Enriched With Vitamin E &amp; Aloe | 4.2Ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="466">₹466</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Lipstick-Enriched-Vitamin-SuperStay/dp/B0B9R5F73S/ref=sr_1_23_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-23-spons&aref=iyyxtPsC7K&sp_csd=d2lkZ2V0TmFtZT1zcF9tdGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51tH4dUKjUL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York SuperStay Matte Ink Liquid Lipstick - Enchanter 380, Highly pigmented, Transfer Proof &amp; Fade Proof. Maybelline New York SuperStay Matte Ink Liquid Lipstick Lasts Up To 16Hr | 5ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="434">₹434</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Superstay-Matte-Brooklyn-Blush/dp/B09CLD61KG/ref=sr_1_24_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-24-spons&aref=8TEbUuEUCH&sp_csd=d2lkZ2V0TmFtZT1zcF9tdGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51c-Re3Rl4L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Staze 9to9 Gloss Lock 2-In-1 Liquid Lipstick | Lip Gloss For Long-Lasting Fuller &amp; Plump Lips | Transfer-Proof&amp;12h Long Stay With Intense Color Payoff | Lightweight &amp; Comfortable | 05 I&#x27;m Happy | 7g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="409">₹409</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Staze-Long-Lasting-Pigmented-Lightweight-Comfortable/dp/B0DK3FT4WL/ref=sr_1_25?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-25" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/41t5lnuwKAL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Serum Lipstick (Matte) 8Hr weightless hydration, One-swipe bold color, Pink - 003 Open Late, 4.2g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="500">₹500</td>
+            <td class="rating" data-value="4.9">
+                <span class="rating-value">4.9/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Lipstick-weightless-hydration-One-swipe/dp/B0FPXBDMPW/ref=sr_1_26?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-26" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61bSp++gfBL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">SUGAR Cosmetics Glide Peptide Serum Lipstick with Hyaluronic Acid &amp; Vitamin E | Velvet Matte Finish | Long Lasting &amp; Pigmented | 1 Swipe Full Coverage | 4.2gm - 06 Moscow Mulberry</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="400">₹400</td>
+            <td class="rating" data-value="4.4">
+                <span class="rating-value">4.4/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/SUGAR-Cosmetics-Glide-Peptide-Lipstick/dp/B0DK77DKLD/ref=sr_1_27?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-27" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61bY9e7VXpL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Swiss Beauty Pure Lustre Lipstick | High Shine Finish | Smooth Glide | With Olive Oil &amp; Vitamin E | Hydrating | Shade- It&#x27;s Bare, 3.8gm</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="314">₹314</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Beauty-Lustre-Lipstick-Vitamin-Hydrating/dp/B0DM9FFB6P/ref=sr_1_28?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-28" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51JkGKK3SnL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Elle 18 Color Pops Matte Lipstick, Code Red, Moisturising Bullet Matte, with Vitamin E, Highly Pigmented, Infused with Jojoba Oil and Shea Butter | 4.3 g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="85">₹85</td>
+            <td class="rating" data-value="3.9">
+                <span class="rating-value">3.9/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Elle-18-Color-Matte-Code/dp/B099K7QNDX/ref=sr_1_29?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-29" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61zq2q9MCpL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Swiss Beauty Matte Long Lasting Stay Maxx Lip Crayon Lipstick | Matte Finish | Smudge Proof | Lightweight | Shade-Murphy Wine, 3.5g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="227">₹227</td>
+            <td class="rating" data-value="4.5">
+                <span class="rating-value">4.5/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Beauty-Lasting-Crayon-Lipstick-Shade/dp/B0F7LP881Q/ref=sr_1_30?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-30" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51s1rfdCy8L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Mamaearth Moisture Matte Longstay Mini Lipstick with Avocado Oil &amp; Vitamin E for 12 Hour Long Stay-08 Pink Tulip - 0.7 g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="307">₹307</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Mamaearth-Moisture-Longstay-Lipstick-Avocado/dp/B0DGX74RFZ/ref=sr_1_31?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-31" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/412sjjlczJL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Serum Lipstick (Satin) 8Hr weightless hydration, One-swipe bold color, Pink - 108 Fit Check, 4.2g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="500">₹500</td>
+            <td class="rating" data-value="4.9">
+                <span class="rating-value">4.9/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Lipstick-weightless-hydration-One-swipe/dp/B0FPX92FFK/ref=sr_1_32?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-32" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51Y1lhjET5L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Superstay Teddy Tint - Lip and Cheek Color - Coffee Date, 5ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="601">₹601</td>
+            <td class="rating" data-value="3.8">
+                <span class="rating-value">3.8/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-York-Superstay-Teddy-Tint/dp/B0F6T8HPZX/ref=sr_1_33?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-33" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/514ONnSumLL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">L’Oreal Paris Infallible Matte Resistance Liquid Lipstick- 635 Worth It Medium, 5ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="749">₹749</td>
+            <td class="rating" data-value="4.2">
+                <span class="rating-value">4.2/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/LOreal-Paris-Infallible-Resistance-Lipstick/dp/B0D6Y4MDLY/ref=sr_1_34?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-34" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/81RfyKcxMEL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Parul Garg Beauty Ultimate 10-in-1 Mini Silk Matte Liquid Lipstick Set for Indian Skin Tone | Long-Lasting, Transfer-Proof | Perfect for Gifting &amp; Special Occasions | Pack of 10, Multicolor</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="990">₹990</td>
+            <td class="rating" data-value="4.3">
+                <span class="rating-value">4.3/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Parul-Garg-Multicolor-Long-Lasting-Transfer-Proof/dp/B0F9SRTPT3/ref=sr_1_35?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-35" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/71KRRnZs1cL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">MARS Queen of Mattes Lipstick Valentine Gift Items Box Set (3 x 4.5 ml) (BROWNS) | Smudgeproof &amp; Transferproof | Intense Swipe Pigmentation | Long-Lasting Wear</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="429">₹429</td>
+            <td class="rating" data-value="4.4">
+                <span class="rating-value">4.4/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/MARS-Transferproof-Pigmentation-Long-Lasting-Customizable/dp/B0DSKWHFXS/ref=sr_1_36?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-36" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51XN3wnLxYL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">MARS Plush Velvet Creamy Matte Lipstick for women | Smooth Glide | One Swipe Pigmentation | Non-Drying and Creamy Formula | Rich and Vibrant Color | 3.2 gm | (16-Dark Magic)</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="179">₹179</td>
+            <td class="rating" data-value="3.7">
+                <span class="rating-value">3.7/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/MARS-Pigmention-Non-Drying-16-LS15-Dark-Magic/dp/B0CQYW97T6/ref=sr_1_37?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-37" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61WOEfXD9xL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Biotique Natural Makeup Magicolor Lipstick, Cookie Crumble, 4g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="69">₹69</td>
+            <td class="rating" data-value="3.7">
+                <span class="rating-value">3.7/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Biotique-Natural-Makeup-Magicolor-Lipstick/dp/B083PCHFTN/ref=sr_1_38?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-38" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51q5dN7otDL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">SUGAR Cosmetics Mettle Satin Lipstick | Highly Pigmented &amp; Silky Matte Finish | Creamy Texture | Mango Butter Infused | 2.2 gm - 07 Gabriella (Soft Dusty Nude/Nude Pink)</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="803">₹803</td>
+            <td class="rating" data-value="4.2">
+                <span class="rating-value">4.2/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/SUGAR-Cosmetics-Mettle-Satin-Lipstick/dp/B082VY9Q3X/ref=sr_1_39_in_f3_0o_fs_mod_primary_alm?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sbo=m6DjfpMzMLDmL8pSMKX8hw%3D%3D&sprefix=lipstic%2Caps%2C435&sr=8-39" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/616qxDHliaL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">FACESCANADA Ultime Pro Hd Intense Matte Lips + Primer - Espresso 03, 1.4G | 9Hr Long Stay | Primer Infused For Flawless Hd Matte Finish | Intense Color Lightweight Silky Smooth Cream Application</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="391">₹391</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Facescanada-Ultime-Intense-Primer-Expresso/dp/B07J1X1FG2/ref=sr_1_40?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-40" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61s-xxO3cYL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Colorbar Lip Prime and Care, 2.5g |Combination | Smudge Proof | Long Wear | Transfer Proof | Ultra-Hydrating | Vitamins E and C</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="808">₹808</td>
+            <td class="rating" data-value="4.2">
+                <span class="rating-value">4.2/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Colorbar-Combination-Transfer-Ultra-Hydrating-Vitamins/dp/B06VSV661Y/ref=sr_1_41?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-41" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61-7jUuqqzL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">MARS Matte Box Set of 3 Lipsticks for Women | Long-Lasting | Smooth Finish | Moisturising | One Swipe Pigmentation | (3x3.2 gm) (01-Red &amp; Maroon)</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="344">₹344</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/MARS-Lipsticks-Long-Lasting-Moisturising-Pigmentation/dp/B0B1F22HSC/ref=sr_1_42?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-42" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/510uH7kFnkL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Liquid Matte Lipstick, Long Lasting, 16hr Wear, Superstay Matte Ink, 65 Seductress, 5ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="426">₹426</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Super-Liquid-Lipstick-Seductress/dp/B07DRRW7GJ/ref=sr_1_43?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-43" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61hQeIvozpL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">SUGAR Cosmetics Matte as Hell Crayon Lipsticks for Women | Lasts Up To 8+ Hours | Lip Crayon with Sharpener | 2.8gm - 35 Claire Redfield</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="789">₹789</td>
+            <td class="rating" data-value="4.2">
+                <span class="rating-value">4.2/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/SUGAR-Cosmetics-Matte-Crayon-Lipstick/dp/B08BHTHY5C/ref=sr_1_44?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-44" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61TA3MTuaSL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Pilgrim Matte Bullet Lipstick Intense Colour Transferproof &amp; Smudgeproof Alpha Brown -34</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="417">₹417</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Pilgrim-Lipstick-Intense-Transferproof-Smudgeproof/dp/B0DD3PD11S/ref=sr_1_45?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-45" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61R4OGMIHqL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">L&#x27;Oreal Paris Infallible Matte Resistance Liquid Lipstick, Lazy Sunday 150, 5 ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="699">₹699</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/LOreal-Paris-Infallible-Resistance-Lipstick/dp/B0BWK72GKL/ref=sr_1_46?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-46" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/41mwkPfNVyL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Iba Long Stay Matte Lipstick for Women- M20 Truffle Candy, 4g | Creamy Matte Finish &amp; Smooth Texture | Long-Lasting | Hydrated Lips | Enriched with Vitamin E | Intense Colour &amp; Highly Pigmented | Lip Makeup</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="280">₹280</td>
+            <td class="rating" data-value="3.9">
+                <span class="rating-value">3.9/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Iba-Long-lasting-hydrating-lightweight-Pigmented/dp/B095LN4B6W/ref=sr_1_47?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-47" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/710P3bAGTLL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">MARS Popstar Non-Drying Liquid Mousse Lipstick for Women with Matte Finish | Lightweight and Non-Sticky Formula | Up to 12 Hour Long Lasting | Transferproof &amp; Waterproof (6.0ml) (03-Chorus Girl)</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="219">₹219</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/MARS-Non-Drying-Lightweight-Non-Sticky-Transferproof/dp/B0CQYYH1VH/ref=sr_1_48?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-48" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61MD9-dJFDL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Superstay Matte Ink Liquid Lipstick - 16H Longwear Matte | Revolutionary, 5ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="712">₹712</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Superstay-Matte-Liquid-Lipstick/dp/B07W59D16G/ref=sr_1_49?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-49" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51rRFRmyKgL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">RENEE Madness Ph Lipstick | Black Lipstick With Glossy Pink Payoff| Long Lasting Nourishment, Enriched With Vitamin E &amp; Jojoba Oil| Vegan &amp; Paraben Free | 3gm</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="365">₹365</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/RENEE-Madness-lipstick-delivers-enriched/dp/B09RK7SCMD/ref=sr_1_50?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-50" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61X304E6gsL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">REVLON Colorstay Limitless Matte Liquid Lipstick for woman, Waterproof, Long-Lasting, 100% Vegan, Lightweight, No-Budge Matte, Stir Me Up - (008)</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="1358">₹1,358</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/REVLON-ColorStay-Limitless-Lightweight-Waterproof/dp/B0DFPYZD8R/ref=sr_1_51?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-51" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51duXoFZEpL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">RENEE Stay Forever Matte Liquid Lipstick Combo | Transfer &amp; Smudge-Proof | Long Lasting | Infused with Vitamin E &amp; Jojoba Oil | Perfect for Gifting, Wedding &amp; Special Occasions | Travel Pack of 10</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="622">₹622</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/RENEE-Stay-Forever-Liquid-Lipstick/dp/B0CSTDN7PC/ref=sr_1_52?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-52" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/41wosv7bI1L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Lakmé Forever Matte Liquid Lip Colour, Nude Pink, 5.6 ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="241">₹241</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Lakme-Forever-Matte-Liquid-Colour/dp/B0828VY9C8/ref=sr_1_53?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-53" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61EyrulUCFL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">L’Oréal Paris Color Riche Satin Lipstick- 108 Cuirve, 4.3 gm</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="637">₹637</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/LOr%C3%A9al-Paris-Color-Lipstick-Cuirve/dp/B07BH83KF6/ref=sr_1_54?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-54" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61t466s-H4L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">SUGAR Cosmetics Partner In Shine Transferproof Glossy Lipstick | Lasts upto 24hrs | Transferproof &amp; Smudgeproof - 3ml - 12 Crimson Cognac</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="601">₹601</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/SUGAR-Cosmetics-Transferproof-Lipstick-Smudgeproof/dp/B0DCP6GXXC/ref=sr_1_55?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-55" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/719cclC9M8L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Swiss Beauty More Than Glitter Lipstick | Glittery Finish | Nourishing | With Vitamin C | One Swipe Smooth Glide | Shade- 5 Shine Mauve, 3gm (‎SB-327)</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="359">₹359</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="0">
+                <span class="sponsored-badge sponsored-no">
+                    Organic
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Glitter-Lipstick-Glittery-Nourishing-Vitamin/dp/B0F6YMGXK8/ref=sr_1_56?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic%2Caps%2C435&sr=8-56" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51kiZSr70qL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Superstay Matte Ink Liquid Lipstick - 16H Longwear Matte | Insider, 5ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="560">₹560</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Superstay-Matte-Liquid-Lipstick/dp/B0FL458714/ref=sr_1_57_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-57-spons&aref=CeaSVH3hYh&sp_csd=d2lkZ2V0TmFtZT1zcF9idGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51HaPbpEH1L._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Maybelline New York Sensational Liquid Matte Lipstick, Non-sticky, Non-drying Lipstick, Super Precise Application, Long-lasting Liquid Matte Lipstick - 08 Sensationally Me| 7ml</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="171">₹171</td>
+            <td class="rating" data-value="4.0">
+                <span class="rating-value">4.0/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Maybelline-Sensational-Liquid-Lipstick-Sensationally/dp/B082L8Q985/ref=sr_1_58_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-58-spons&aref=a97gulacQU&sp_csd=d2lkZ2V0TmFtZT1zcF9idGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/51rOliS-seL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">Swiss Beauty Satin Comfort Lipstick | Ultra-Hydrating | Highly Pigmented | Smooth Glide | Satin Matte Finish | One-Swipe Application | Shade- 5 Vintage Pink, 3gm</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="199">₹199</td>
+            <td class="rating" data-value="4.1">
+                <span class="rating-value">4.1/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/Lipstick-Ultra-Hydrating-Pigmented-One-Swipe-Application/dp/B0F7LBN1PJ/ref=sr_1_59_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-59-spons&aref=OwvVjQb1Sk&sp_csd=d2lkZ2V0TmFtZT1zcF9idGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="image">
+                <img src="https://m.media-amazon.com/images/I/61xJuEdY8dL._AC_UL320_.jpg" loading="lazy" alt="Product image">
+            </td>
+            <td class="title">LoveChild Masaba &quot;The Batua&quot; Lipstick, Barfi Wine (Wine) Rich Satin Finish Lipstick with Built-in Mirror, Hydrating, Nourishing Formula with Jojoba Oil, 4g</td>
+            <td class="subtitle">same as title</td>
+            <td class="price" data-value="1300">₹1,300</td>
+            <td class="rating" data-value="4.6">
+                <span class="rating-value">4.6/5</span>
+            </td>
+            <td class="sponsored" data-value="1">
+                <span class="sponsored-badge sponsored-yes">
+                    Sponsored
+                </span>
+            </td>
+            <td class="link">
+                <a href="https://www.amazon.in/LoveChild-Masaba-Lipstick-Hydrating-Nourishing/dp/B0FVFLW65J/ref=sr_1_60_sspa?crid=1UPZEIOSR28PW&dib=eyJ2IjoiMSJ9.UEw53yhaVFJXiA5LPFzTnEFzcY2v-EGtKdBv6LzJIPvcujo__TNYbridLeAJ5Z1ZcWUASBhsl9EA1LSl4d91cbsoUI6o19irI7mPZ4LEyAcasbR5XJXiSfj6dIi9orvXMAs7TKm_QyIffIQTjj7W-mZOUK1HF6In0gOF-TfktFmCyGJOWOvHn8syzQVddyqf2mdRXC4qkhH_zgcye-ooVwCtnuLSca2QWrKv43AfbHE0SzQ1bMv9er7ycvtLid673ui3DCH4pXS3oNRYAl3abD6sVnuWhTLIAnLmHZ_hO0Y.oGJL7N4bwMH8XLzHaMss_jCL7Z7OSheZzHbt61ZBRto&dib_tag=se&keywords=lipstick&qid=1770730019&sprefix=lipstic,aps,435&sr=8-60-spons&aref=vwek0VJCY1&sp_csd=d2lkZ2V0TmFtZT1zcF9idGY&psc=1" target="_blank" class="link-button">View</a>
+            </td>
+        </tr>
+        
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// Initialize table on load
+document.addEventListener('DOMContentLoaded', initTable);
+</script>
+</body>
+</html>
