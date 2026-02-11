@@ -444,4 +444,3 @@ print("Switched to new tab")
 | Browser Control    | switch_to.frame, switch_to.window     |
 | Special Elements   | Select, alert handling                |
 
-Every interaction ultimately routes through the WebDriver protocol, ensuring that actions replicate real browser behavior rather than simple DOM mutation.

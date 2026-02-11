@@ -296,14 +296,3 @@ Complete automation of login, workflow, validation, logout.
 
 ---
 
-## Difficulty Scaling Summary
-
-| Level   | Focus                                    | Skill Required     |
-| ------- | ---------------------------------------- | ------------------ |
-| Level 1 | Basic element interaction                | Beginner           |
-| Level 2 | State handling and flow                  | Intermediate       |
-| Level 3 | DOM manipulation and behavior simulation | Upper intermediate |
-| Level 4 | System-level automation workflows        | Advanced           |
-| Level 5 | Architecture and distributed automation  | Expert             |
-
-These projects progressively move from simple interaction control to system-scale automation engineering, reflecting increasing complexity in DOM traversal, session handling, performance optimization, and architectural planning.
