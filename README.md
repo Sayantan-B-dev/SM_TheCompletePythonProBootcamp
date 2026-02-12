@@ -16,3 +16,7 @@
 
 # UNDONE
 - > Section 46 is pending because spotify develoloper dashboard is on maintenance.
+- > Section 50 is pending because tinder aint easy to scrape dude
+- > Section 51 is pending because twitter has anti bot stuff.
+- > Section 52 is pending because instagram has anti bot stuff.
+- > Section 53 is pending because need some research to do.
