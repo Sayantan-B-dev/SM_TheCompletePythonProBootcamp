@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anime A–Z</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0b0b0b;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    padding: 40px;
+}
+
+header {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+#controls {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+select {
+    background: #111;
+    color: #fff;
+    border: 0.5px solid #444;
+    padding: 8px 14px;
+    font-size: 14px;
+    outline: none;
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 24px;
+}
+
+.card {
+    background: #111;
+    border: 0.5px solid #333;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+    border-color: #777;
+    transform: translateY(-3px);
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    display: block;
+    border-bottom: 0.5px solid #333;
+}
+
+.card-content {
+    padding: 12px;
+}
+
+.card-title {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.card-title a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.card-title a:hover {
+    color: #bbbbbb;
+}
+
+#pageIndicator {
+    display: block;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #888;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>
+ANIME A–Z COLLECTION
+<span id="pageIndicator"></span>
+</header>
+
+<div id="controls">
+<label for="pageSelect">Select Page:</label>
+<select id="pageSelect"></select>
+</div>
+
+<div id="grid"></div>
+
+<script>
+(function() {
+"use strict";
+
+const gridEl = document.getElementById('grid');
+const pageSelect = document.getElementById('pageSelect');
+const pageIndicator = document.getElementById('pageIndicator');
+
+let animePages = null;
+let sortedPageKeys = [];
+
+function getPageLabel(pageKey) {
+    if (!pageKey) return '';
+    const num = parseInt(pageKey.split('-')[1]);
+    return `Page ${num}`;
+}
+
+function renderPage(pageKey) {
+    if (!animePages || !animePages[pageKey]) return;
+
+    gridEl.innerHTML = '';
+    pageIndicator.textContent = getPageLabel(pageKey);
+
+    const fragment = document.createDocumentFragment();
+
+    animePages[pageKey].forEach(anime => {
+        if (!anime.title) return;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const img = document.createElement('img');
+        img.src = anime.image || '';
+        img.alt = anime.title;
+        img.loading = 'lazy';
+        img.onerror = function(e) {
+            e.target.style.background = "#222";
+        };
+
+        const content = document.createElement('div');
+        content.className = 'card-content';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'card-title';
+
+        const link = document.createElement('a');
+        link.href = anime.link || '#';
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = anime.title;
+
+        titleDiv.appendChild(link);
+        content.appendChild(titleDiv);
+        card.appendChild(img);
+        card.appendChild(content);
+        fragment.appendChild(card);
+    });
+
+    gridEl.appendChild(fragment);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function populateSelect() {
+    pageSelect.innerHTML = '';
+    sortedPageKeys.forEach(key => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = getPageLabel(key);
+        pageSelect.appendChild(option);
+    });
+}
+
+async function loadData() {
+    try {
+        const response = await fetch('anime_data_paginated_fetched.json');
+        if (!response.ok) throw new Error('JSON not found');
+
+        animePages = await response.json();
+
+        sortedPageKeys = Object.keys(animePages).sort((a, b) => {
+            const numA = parseInt(a.split('-')[1]);
+            const numB = parseInt(b.split('-')[1]);
+            return numA - numB;
+        });
+
+        populateSelect();
+        renderPage(sortedPageKeys[0]);
+        pageSelect.value = sortedPageKeys[0];
+
+        pageSelect.addEventListener('change', (e) => renderPage(e.target.value));
+
+    } catch (error) {
+        gridEl.innerHTML = `<div style="text-align:center; padding:40px;">Failed to load JSON file.</div>`;
+    }
+}
+
+loadData();
+
+})();
+</script>
+
+</body>
+</html>
