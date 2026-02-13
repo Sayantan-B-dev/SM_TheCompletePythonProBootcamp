@@ -1,0 +1,27 @@
+body {
+    background-color: #121212;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+    margin: 200px auto;
+    padding: 100px;
+    width:fit-content;
+    border-radius: 10px;
+}
+a{
+    color: white;
+    border: 1px solid white;
+    padding: 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    &:hover{
+        background-color: white;
+        color: black;
+        scale: 1.1;
+    }
+    &:active{
+        background-color: black;
+        color: white;
+        scale: 0.9;
+    }   
+}
