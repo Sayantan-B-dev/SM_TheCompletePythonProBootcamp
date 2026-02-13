@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/profile_style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="profile-container">
+
+        <div class="profile-card">
+
+            <div class="profile-image-wrapper">
+                <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Profile Image">
+                <div class="status-indicator"></div>
+            </div>
+
+            <div class="profile-content">
+
+                <h1 class="profile-name">Hello World</h1>
+                <p class="profile-role">Full Stack Developer • UI Engineer • Creator</p>
+
+                <p class="profile-bio">
+                    This is a modern advanced profile layout designed with layered structure,
+                    smooth animations, glassmorphism styling, and responsive layout principles.
+                </p>
+
+                <div class="profile-stats">
+                    <div class="stat-box">
+                        <span class="stat-number">120+</span>
+                        <span class="stat-label">Projects</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">5+</span>
+                        <span class="stat-label">Years Experience</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number">98%</span>
+                        <span class="stat-label">Satisfaction</span>
+                    </div>
+                </div>
+
+                <div class="profile-buttons">
+                    <a href="/" class="btn-primary">View Portfolio</a>
+                    <a href="#" class="btn-outline">Contact Me</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
