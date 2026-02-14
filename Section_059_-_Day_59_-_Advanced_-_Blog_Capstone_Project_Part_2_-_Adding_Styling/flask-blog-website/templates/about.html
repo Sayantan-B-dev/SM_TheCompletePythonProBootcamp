@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - FlaskBlog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-6" data-aos="fade-right">
+            <h1 class="display-3 fw-bold">About <span class="text-primary">FlaskBlog</span></h1>
+            <p class="lead">We are a community of writers and developers passionate about sharing knowledge.</p>
+            <p>FlaskBlog was founded in 2025 with the mission to provide a platform for high-quality, insightful content. Our team believes in the power of words to educate, inspire, and connect people from all walks of life.</p>
+            <p>Whether you're a seasoned developer or just starting your journey, you'll find something valuable here. From tutorials to opinion pieces, we cover a wide range of topics in tech, design, and lifestyle.</p>
+            <div class="mt-4">
+                <h5>Our Values</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check-circle text-primary me-2"></i> Quality content</li>
+                    <li><i class="fas fa-check-circle text-primary me-2"></i> Community driven</li>
+                    <li><i class="fas fa-check-circle text-primary me-2"></i> Open source</li>
+                    <li><i class="fas fa-check-circle text-primary me-2"></i> Inclusivity</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+            <img src="https://via.placeholder.com/600x400" class="img-fluid rounded-4 shadow" alt="About us">
+        </div>
+    </div>
+    
+    <!-- Team Section -->
+    <div class="row mt-5">
+        <div class="col-12 text-center mb-4" data-aos="fade-up">
+            <h2 class="display-5 fw-bold">Meet the <span class="text-primary">Team</span></h2>
+        </div>
+        <div class="col-md-4 text-center" data-aos="zoom-in">
+            <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Team member">
+            <h4>Alex Johnson</h4>
+            <p class="text-muted">Founder & Lead Editor</p>
+        </div>
+        <div class="col-md-4 text-center" data-aos="zoom-in" data-aos-delay="100">
+            <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Team member">
+            <h4>Sarah Williams</h4>
+            <p class="text-muted">Senior Writer</p>
+        </div>
+        <div class="col-md-4 text-center" data-aos="zoom-in" data-aos-delay="200">
+            <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Team member">
+            <h4>Michael Brown</h4>
+            <p class="text-muted">Technical Lead</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Blogs - FlaskBlog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center" data-aos="fade-up">
+            <h1 class="display-3 fw-bold">Our <span class="text-primary">Blogs</span></h1>
+            <p class="lead">Explore our latest articles and insights</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        {% if blogs %}
+            {% for blog in blogs %}
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 50 }}">
+                <div class="blog-card">
+                    <!-- featured_image -->
+                    <img src="{{ blog.featured_image or 'https://via.placeholder.com/600x400?text=No+Image' }}" 
+                         class="card-img-top" alt="{{ blog.title }}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <!-- category -->
+                            <span class="badge bg-primary">{{ blog.category or 'General' }}</span>
+                            <!-- created_at -->
+                            <small class="text-muted">{{ blog.created_at }}</small>
+                        </div>
+                        <h5 class="card-title">{{ blog.title }}</h5>
+                        <!-- subtitle as description (if available) -->
+                        <p class="card-text">{{ blog.subtitle|truncate(100) if blog.subtitle else 'No description available.' }}</p>
+                        <a href="{{ url_for('blog_detail', blog_id=blog.id) }}" class="btn btn-primary">Read More <i class="fas fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
+                <h3>No blogs found</h3>
+                <p class="text-muted">Check back later for new content.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <nav aria-label="Blog pagination" class="mt-5" data-aos="fade-up">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{ 'disabled' if not has_prev }}">
+                <a class="page-link" href="{{ url_for('blogs', page=current_page-1) if has_prev else '#' }}" aria-label="Previous">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == current_page %}
+                <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                {% elif p <= current_page + 2 and p >= current_page - 2 %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('blogs', page=p) }}">{{ p }}</a></li>
+                {% elif p == 1 or p == total_pages %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('blogs', page=p) }}">{{ p }}</a></li>
+                {% elif p == current_page - 3 or p == current_page + 3 %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            <li class="page-item {{ 'disabled' if not has_next }}">
+                <a class="page-link" href="{{ url_for('blogs', page=current_page+1) if has_next else '#' }}" aria-label="Next">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

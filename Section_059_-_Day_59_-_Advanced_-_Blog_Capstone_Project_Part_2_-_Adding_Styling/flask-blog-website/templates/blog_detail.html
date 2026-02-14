@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ blog.title }} - FlaskBlog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="blog-detail" data-aos="fade-up">
+        <div class="text-center mb-4">
+            <h1>{{ blog.title }}</h1>
+            <div class="blog-meta justify-content-center">
+                <!-- created_at -->
+                <span><i class="far fa-calendar-alt me-1"></i> {{ blog.created_at }}</span>
+                <!-- author from nested user object -->
+                <span><i class="far fa-user me-1"></i> {{ blog.user.first_name ~ ' ' ~ blog.user.last_name if blog.user else 'Admin' }}</span>
+                <!-- category -->
+                <span><i class="far fa-folder me-1"></i> {{ blog.category or 'General' }}</span>
+            </div>
+        </div>
+        
+        <!-- featured_image -->
+        {% if blog.featured_image %}
+        <img src="{{ blog.featured_image }}" class="img-fluid rounded-4 mb-4 w-100" alt="{{ blog.title }}">
+        {% endif %}
+        
+        <!-- subtitle as a lead paragraph -->
+        {% if blog.subtitle %}
+        <p class="lead mb-4">{{ blog.subtitle }}</p>
+        {% endif %}
+        
+        <!-- main_content (HTML decoded automatically by Jinja2 |safe) -->
+        <div class="blog-content">
+            {% if blog.main_content %}
+                {{ blog.main_content|safe }}
+            {% else %}
+                <p>No content available for this blog post.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Tags (if any) -->
+        {% if blog.tags %}
+        <div class="mt-4">
+            <h5>Tags:</h5>
+            {% for tag in blog.tags %}
+            <span class="badge bg-secondary me-1">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Share buttons (unchanged) -->
+        <div class="mt-5">
+            <h5>Share this post:</h5>
+            <a href="#" class="btn btn-outline-primary me-2"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="btn btn-outline-info me-2"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="btn btn-outline-success me-2"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="btn btn-outline-secondary"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        
+        <!-- Comments section -->
+        <div class="mt-5">
+            <h3>Comments ({{ blog.comments|length if blog.comments else 0 }})</h3>
+            {% if blog.comments %}
+                {% for comment in blog.comments %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <p>{{ comment.main_content }}</p>
+                        <small class="text-muted">- Comment by User on {{ comment.created_at }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No comments yet.</p>
+            {% endif %}
+            
+            <!-- Comment form (placeholder) -->
+            <form class="mt-4">
+                <h5>Leave a comment</h5>
+                <div class="mb-3">
+                    <textarea class="form-control" rows="3" placeholder="Your comment..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

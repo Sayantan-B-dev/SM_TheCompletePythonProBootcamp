@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}FlaskBlog - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-8" data-aos="fade-right">
+                <h1 class="display-1 fw-bold">Write, Share,<br>Inspire.</h1>
+                <p class="lead mb-4">A modern blog platform built with Flask and Bootstrap. Share your thoughts with the world.</p>
+                <a href="{{ url_for('blogs') }}" class="btn btn-light btn-lg px-5 py-3 rounded-pill">
+                    <i class="fas fa-book-open me-2"></i>Start Reading
+                </a>
+                <a href="{{ url_for('about') }}" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill ms-3">
+                    <i class="fas fa-info-circle me-2"></i>Learn More
+                </a>
+            </div>
+            <div class="col-lg-4" data-aos="fade-left" data-aos-delay="200">
+                <div class="hero-stats glass-effect p-4 rounded-4">
+                    <div class="stat-item mb-4">
+                        <h3 class="fw-bold">100+</h3>
+                        <p class="mb-0">Blog Posts</p>
+                    </div>
+                    <div class="stat-item mb-4">
+                        <h3 class="fw-bold">5K+</h3>
+                        <p class="mb-0">Readers</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="fw-bold">50+</h3>
+                        <p class="mb-0">Authors</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Posts Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="display-4 fw-bold">Featured <span class="text-primary">Posts</span></h2>
+            <p class="lead">Check out our most popular articles</p>
+        </div>
+        <div class="row g-4">
+            {% if featured_blogs %}
+                {% for blog in featured_blogs %}
+                <div class="col-md-4" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <div class="blog-card">
+                        {% set image = blog.featured_image or blog.image or 'https://via.placeholder.com/600x400?text=No+Image' %}
+                        <img src="{{ image }}" class="card-img-top" alt="{{ blog.title }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                {% set category = blog.category or 'General' %}
+                                <span class="badge bg-primary">{{ category }}</span>
+                                {% set date = blog.created_at or blog.date or 'March 12, 2025' %}
+                                <small class="text-muted">{{ date }}</small>
+                            </div>
+                            <h5 class="card-title">{{ blog.title }}</h5>
+                            {% set summary = blog.summary or blog.content or blog.body or 'No description available.' %}
+                            <p class="card-text">{{ summary|truncate(100) }}</p>
+                            <a href="{{ url_for('blog_detail', blog_id=blog.id) }}" class="btn btn-primary">Read More <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback placeholders if no blogs -->
+                {% for i in range(3) %}
+                <div class="col-md-4" data-aos="zoom-in" data-aos-delay="{{ i * 100 }}">
+                    <div class="blog-card">
+                        <img src="https://via.placeholder.com/600x400" class="card-img-top" alt="Blog image">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="badge bg-primary">Technology</span>
+                                <small class="text-muted">March 12, 2025</small>
+                            </div>
+                            <h5 class="card-title">Sample Blog Post Title</h5>
+                            <p class="card-text">This is a sample blog post description. It gives a brief overview of the content...</p>
+                            <a href="#" class="btn btn-primary">Read More <i class="fas fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{{ url_for('blogs') }}" class="btn btn-outline-primary btn-lg rounded-pill px-5">View All Blogs</a>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h2 class="display-5 fw-bold">Subscribe to our Newsletter</h2>
+                <p class="lead">Get the latest posts and updates directly in your inbox.</p>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <form class="newsletter-form">
+                    <div class="input-group input-group-lg">
+                        <input type="email" class="form-control" placeholder="Enter your email" required>
+                        <button class="btn btn-light" type="submit">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
