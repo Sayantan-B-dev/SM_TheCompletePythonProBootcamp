@@ -1,5 +1,5 @@
 # =========================
-# PYTHON
+# PYTHON CACHE / BYTECODE
 # =========================
 __pycache__/
 *.py[cod]
@@ -17,6 +17,19 @@ env/
 ENV/
 virtualenv/
 pip-wheel-metadata/
+
+# =========================
+# DATABASE FILES
+# =========================
+*.db
+*.sqlite3
+
+# =========================
+# ENVIRONMENT VARIABLES / SECRETS
+# =========================
+.env
+.env.*
+*.env
 
 # =========================
 # IDE / EDITOR CONFIG
@@ -40,9 +53,10 @@ desktop.ini
 *.log
 logs/
 log/
+instance/
 
 # =========================
-# PYTHON BUILD / DIST
+# BUILD / DISTRIBUTION
 # =========================
 build/
 dist/
@@ -64,14 +78,7 @@ htmlcov/
 .ipynb_checkpoints/
 
 # =========================
-# ENV / SECRETS
-# =========================
-.env
-.env.*
-*.env
-
-# =========================
-# CACHE / TEMP
+# CACHE / TEMP FILES
 # =========================
 .cache/
 .tmp/

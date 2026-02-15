@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add a Book</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>➕ Add a New Book</h1>
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="title">Book Title</label>
+                <input type="text" id="title" name="title" placeholder="e.g., Harry Potter" required>
+            </div>
+
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" name="author" placeholder="e.g., J.K. Rowling" required>
+            </div>
+
+            <div class="form-group">
+                <label for="rating">Rating (0-10)</label>
+                <input type="number" id="rating" name="rating" step="0.1" min="0" max="10" placeholder="e.g., 9.5" required>
+            </div>
+
+            <button type="submit" class="btn">Add Book</button>
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>
