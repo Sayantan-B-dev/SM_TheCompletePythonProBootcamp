@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Welcome to the Secret Page</h1>
+    <p>This is a secret area. You need to log in to see the secrets and download the exclusive Flask cheat sheet.</p>
+
+    {% if current_user.is_authenticated %}
+        <p class="logged-in-message">(you are already logged in as {{ current_user.name }})</p>
+        <div class="auth-buttons">
+            <a href="{{ url_for('secrets') }}" class="btn">Go to Secrets</a>
+        </div>
+    {% else %}
+        <div class="auth-buttons">
+            <a href="{{ url_for('login') }}" class="btn">Login</a>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+        </div>
+    {% endif %}
+{% endblock %}
