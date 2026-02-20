@@ -1,0 +1,80 @@
+{
+  "name": "Sayantan Bharati",
+  "title": "Full Stack Developer(MERN/Python)",
+  "location": "Kolkata",
+  "contact": {
+    "email": "sayantanbharati611@gmail.com",
+    "linkedin": "linkedin.com/in/sayantan-bharati-6b1b77205/",
+    "github": "github.com/Sayantan-B-dev"
+  },
+  "summary": "I'm a Full Stack Web Developer with experience in the MERN stack and Python. I build responsive and user-friendly web applications handling both front end and back end. I focus on writing well manageable clean code, file and folder structure, creating efficient workflows, and developing practical solutions that actually make a real difference.",
+  "projects": [
+    {
+      "name": "Re-Docs · note platform",
+      "description": "Markdown + math, public/private notes, exports. Session auth (Passport local + Google OAuth), social features, file uploads.",
+      "image": "https://images.pexels.com/photos/1055613/pexels-photo-1055613.jpeg",
+      "tags": ["MongoDB", "Express", "React (Vite)", "Node.js", "Tailwind", "Cloudinary"],
+      "link": "https://re-docs-pi.vercel.app/"
+    },
+    {
+      "name": "ArtBeats · art gallery",
+      "description": "Community art gallery with mapped artworks. User registration, CRUD for artworks & comments, geolocation, file uploads.",
+      "image": "https://images.pexels.com/photos/638701/pexels-photo-638701.jpeg",
+      "tags": ["Node.js", "Express", "MongoDB", "EJS", "MapTiler", "Passport"],
+      "link": "https://artbeats.onrender.com/"
+    }
+  ],
+  "education": {
+    "degree": "Diploma in Computer Science & Technology",
+    "institution": "KINGSTON EDUCATIONAL INSTITUTE",
+    "duration": "2024 – 2026",
+    "details": "CDSA, Python, JAVA, OS introduction, DBMS (MySQL), CN intermediate, AI/ML intro, IoT intro and more."
+  },
+  "skills": {
+    "frontend": ["HTML", "CSS", "JavaScript (ES6)", "React", "Tailwind", "Vite", "Axios"],
+    "backend": ["Node.js", "Express", "MongoDB", "SQL", "REST APIs", "Passport", "Google OAuth"]
+  },
+  "languages": [
+    {"name": "Bengali", "level": "Native"},
+    {"name": "English", "level": "Advanced"},
+    {"name": "Hindi", "level": "Intermediate"}
+  ],
+  "certifications": [
+    {
+      "title": "The Web Developer Bootcamp 2025",
+      "url": "http://ude.my/UC-522fc92e-484b-408d-acc9-514fd997ba5c"
+    },
+    {
+      "title": "The Complete Full‑Stack Web Development Bootcamp",
+      "url": "http://ude.my/UC-b18c98f0-980b-464b-ad26-f2606cd64bc9"
+    },
+    {
+      "title": "Job Ready AI Powered Cohort: Web + DSA + Aptitude",
+      "url": "https://classroom.sheryians.com/certificate/1708853705220236"
+    },
+    {
+      "title": "The Complete Python Bootcamp From Zero to Hero in Python",
+      "url": "http://ude.my/UC-c778160d-4e6e-4e6e-a664-f93c1f60d93e"
+    },{
+      "title": "JavaScript: Understanding the Weird Parts",
+      "url": "http://ude.my/UC-4468e243-69e2-4161-a741-a271ac42bd57"
+    },{
+      "title": "JavaScript: Understanding the Weird Parts",
+      "url": "http://ude.my/UC-d913382c-396c-487e-ab2e-20d6807e1f00"
+    }
+  ],
+  "experience": [
+    {
+      "role": "Crew Member",
+      "company": "McDonald's",
+      "location": "Kolkata, India",
+      "description": "Soft skills: teamwork, rapid learning, client interactions, time management, handling high workloads effectively."
+    },
+    {
+      "role": "Music Producer & Sound Engineer",
+      "company": "Freelancer",
+      "location": "Remote",
+      "description": "Project management, client relations, resource utilization, multi‑tasking, time management, workflow optimization, quality control, deadline handling, high‑volume delivery."
+    }
+  ]
+}
