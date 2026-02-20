@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }}{% endblock %}
+{% block content %}
+<div class="mb-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <div class="text-sm text-gray-500 mb-2">
+                <a href="{{ url_for('index') }}" class="hover:text-blue-600">Projects</a> > <span class="text-gray-600">{{ project.name }}</span>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800">{{ project.name }}</h1>
+            {% if project.description %}
+                <p class="text-gray-500 mt-2">{{ project.description }}</p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('new_task', project_id=project.id) }}" class="bg-green-500 hover:bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition shadow-sm">
+            <i class="fas fa-plus mr-2"></i>Add Task
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- To Do -->
+    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-700">To Do</h2>
+            <span class="bg-gray-200 text-gray-700 px-2.5 py-1 rounded-full text-xs font-medium">{{ todo_tasks|length }}</span>
+        </div>
+        <div class="space-y-3">
+            {% for task in todo_tasks %}
+                {% include 'task_card.html' %}
+            {% else %}
+                <p class="text-gray-400 text-center py-6 text-sm">No tasks in To Do</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- In Progress -->
+    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-yellow-700">In Progress</h2>
+            <span class="bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full text-xs font-medium">{{ doing_tasks|length }}</span>
+        </div>
+        <div class="space-y-3">
+            {% for task in doing_tasks %}
+                {% include 'task_card.html' %}
+            {% else %}
+                <p class="text-gray-400 text-center py-6 text-sm">No tasks in progress</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Done -->
+    <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-green-700">Done</h2>
+            <span class="bg-green-100 text-green-800 px-2.5 py-1 rounded-full text-xs font-medium">{{ done_tasks|length }}</span>
+        </div>
+        <div class="space-y-3">
+            {% for task in done_tasks %}
+                {% include 'task_card.html' %}
+            {% else %}
+                <p class="text-gray-400 text-center py-6 text-sm">No completed tasks</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
