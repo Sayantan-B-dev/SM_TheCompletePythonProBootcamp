@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dangerous Writer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 80%;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #ff4444;
+        }
+        .timer {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+        .warning {
+            color: #ff4444;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️ The Most Dangerous Writer</h1>
+        <p>Stop typing for 5 seconds and everything will be deleted!</p>
+        <textarea id="editor" placeholder="Start writing..."></textarea>
+        <div class="timer" id="timer">Time left: <span id="seconds">5</span>s</div>
+    </div>
+
+    <script>
+        (function() {
+            const editor = document.getElementById('editor');
+            const secondsSpan = document.getElementById('seconds');
+            let timeLeft = 5;
+            let timerInterval = null;
+
+            // Function to reset the timer
+            function resetTimer() {
+                timeLeft = 5;
+                updateDisplay();
+            }
+
+            // Update the displayed seconds
+            function updateDisplay() {
+                secondsSpan.textContent = timeLeft;
+            }
+
+            // Clear the textarea and reset timer
+            function deleteAll() {
+                editor.value = '';
+                resetTimer();
+            }
+
+            // Start the countdown interval
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft -= 1;
+                    updateDisplay();
+
+                    if (timeLeft <= 0) {
+                        deleteAll();
+                        // After deletion, reset timeLeft to 5 (deleteAll already calls resetTimer)
+                        // But we must also clear and restart the interval to avoid double counting
+                        clearInterval(timerInterval);
+                        timerInterval = setInterval(() => {
+                            timeLeft -= 1;
+                            updateDisplay();
+                            if (timeLeft <= 0) {
+                                deleteAll();
+                            }
+                        }, 1000);
+                    }
+                }, 1000);
+            }
+
+            // Event listener: any input resets the countdown
+            editor.addEventListener('input', () => {
+                resetTimer();
+                // Ensure the timer is running
+                if (!timerInterval) {
+                    startTimer();
+                }
+            });
+
+            // Initialize timer on page load
+            startTimer();
+
+            // Optional: stop timer if user clicks away? Not needed – input event will restart.
+        })();
+    </script>
+</body>
+</html>
