@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Converting...{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto bg-gray-800 rounded-lg shadow-xl p-8 border border-gray-700">
+    <h1 class="text-2xl font-bold mb-6 text-white flex items-center">
+        <i class="fas fa-spinner fa-pulse mr-3 text-blue-400"></i>Converting your PDF
+    </h1>
+    
+    <div class="mb-6">
+        <div class="flex justify-between mb-1">
+            <span class="text-base font-medium text-blue-400" id="status">Starting...</span>
+            <span class="text-sm font-medium text-blue-400" id="percentage">0%</span>
+        </div>
+        <div class="w-full bg-gray-700 rounded-full h-2.5">
+            <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" id="progressBar" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 text-sm text-gray-300 mb-6">
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Original file:</span>
+            <span id="originalFilename" class="block font-medium text-white truncate"></span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">File size:</span>
+            <span id="fileSize" class="block font-medium text-white"></span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Pages:</span>
+            <span id="pages" class="block font-medium text-white">0 / 0</span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Text length:</span>
+            <span id="textLength" class="block font-medium text-white">0 chars</span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Est. audio duration:</span>
+            <span id="estDuration" class="block font-medium text-white">0 sec</span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Audio size:</span>
+            <span id="audioSize" class="block font-medium text-white">-</span>
+        </div>
+    </div>
+
+    <!-- Cancel button -->
+    <div class="flex justify-center mt-4">
+        <button id="cancelBtn" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200 flex items-center space-x-2">
+            <i class="fas fa-times-circle"></i>
+            <span>Cancel Conversion</span>
+        </button>
+    </div>
+
+    <p class="text-gray-400 text-sm mt-4" id="detail">Processing...</p>
+
+    <div class="mt-6 text-center hidden" id="errorBox">
+        <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded relative">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline" id="errorMessage"></span>
+        </div>
+        <a href="{{ url_for('index') }}" class="inline-block mt-4 text-blue-400 hover:text-blue-300">
+            <i class="fas fa-arrow-left mr-1"></i>Try again
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Pulsing animation for the progress bar when stalled */
+    .pulse {
+        animation: pulse-animation 1.5s infinite;
+    }
+    @keyframes pulse-animation {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const taskId = "{{ task_id }}";
+    let polling = true;
+
+    function fetchProgress() {
+        if (!polling) return;
+        fetch(`/api/progress/${taskId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('errorBox').classList.remove('hidden');
+                    document.getElementById('errorMessage').innerText = data.error;
+                    document.getElementById('status').innerText = 'Failed';
+                    polling = false;
+                    return;
+                }
+
+                // Update progress bar
+                const progressBar = document.getElementById('progressBar');
+                progressBar.style.width = data.progress + '%';
+                document.getElementById('percentage').innerText = data.progress + '%';
+                document.getElementById('status').innerText = data.status;
+
+                // Add pulse effect if progress is stuck between 40-89 (TTS phase)
+                if (data.progress >= 40 && data.progress < 90 && !data.completed) {
+                    progressBar.classList.add('pulse');
+                } else {
+                    progressBar.classList.remove('pulse');
+                }
+
+                // Update details
+                document.getElementById('originalFilename').innerText = data.original_filename || '-';
+                document.getElementById('fileSize').innerText = data.total_bytes ? 
+                    (data.total_bytes / 1024).toFixed(1) + ' KB' : '-';
+                document.getElementById('pages').innerText = 
+                    `${data.pages_processed || 0} / ${data.total_pages || 0}`;
+                document.getElementById('textLength').innerText = 
+                    data.formatted_text_length || '0 chars';
+                document.getElementById('estDuration').innerText = 
+                    data.formatted_est_duration || '0 sec';
+                document.getElementById('audioSize').innerText = 
+                    data.formatted_audio_size || '-';
+
+                if (data.error) {
+                    document.getElementById('errorBox').classList.remove('hidden');
+                    document.getElementById('errorMessage').innerText = data.error;
+                    polling = false;
+                } else if (data.completed && data.audio_file) {
+                    window.location.href = `/result/${taskId}`;
+                } else {
+                    setTimeout(fetchProgress, 1000);
+                }
+            })
+            .catch(err => {
+                console.error('Polling error:', err);
+                setTimeout(fetchProgress, 2000);
+            });
+    }
+
+    // Cancel button handler
+    document.getElementById('cancelBtn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to cancel this conversion?')) {
+            fetch(`/cancel/${taskId}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('status').innerText = 'Cancelling...';
+                        document.getElementById('cancelBtn').disabled = true;
+                        document.getElementById('cancelBtn').innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Cancelling...';
+                        // Optionally stop polling after a short delay
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 2000);
+                    } else {
+                        alert('Cancel failed: ' + data.error);
+                    }
+                });
+        }
+    });
+
+    fetchProgress();
+</script>
+{% endblock %}

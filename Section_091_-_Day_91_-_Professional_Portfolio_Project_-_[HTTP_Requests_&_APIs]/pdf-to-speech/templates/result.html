@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Conversion Complete{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto bg-gray-800 rounded-lg shadow-xl p-8 border border-gray-700">
+    <div class="mb-6 text-green-400 text-center">
+        <i class="fas fa-check-circle text-6xl"></i>
+    </div>
+    <h1 class="text-3xl font-bold mb-4 text-white text-center">Your Audiobook is Ready!</h1>
+    
+    <div class="grid grid-cols-2 gap-4 text-sm text-gray-300 mb-8">
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Original file:</span>
+            <span class="block font-medium text-white">{{ task.original_filename }}</span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Output file:</span>
+            <span class="block font-medium text-white">{{ task.audio_file }}</span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Total pages:</span>
+            <span class="block font-medium text-white">{{ task.total_pages }}</span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Text length:</span>
+            <span class="block font-medium text-white">{{ "{:,}".format(task.text_length) }} chars</span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Audio duration:</span>
+            <span class="block font-medium text-white">
+                {% if task.actual_duration %}
+                    {{ (task.actual_duration / 60)|round(1) }} min
+                {% else %}
+                    {{ (task.est_duration / 60)|round(1) }} min (est.)
+                {% endif %}
+            </span>
+        </div>
+        <div class="bg-gray-700 p-3 rounded">
+            <span class="text-gray-400">Audio size:</span>
+            <span class="block font-medium text-white">
+                {% if task.audio_size %}
+                    {{ (task.audio_size / 1024 / 1024)|round(1) }} MB
+                {% else %}
+                    -
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Audio Player -->
+    <div class="mb-8">
+        <audio controls class="w-full" preload="metadata">
+            <source src="{{ url_for('download', filename=task.audio_file) }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <p class="text-gray-400 text-sm text-center mt-2">Listen online or download below</p>
+    </div>
+
+    <div class="flex justify-center space-x-4">
+        <a href="{{ url_for('download', filename=task.audio_file) }}" 
+           class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-lg transition duration-200">
+            <i class="fas fa-download mr-2"></i>Download MP3
+        </a>
+        <a href="{{ url_for('index') }}" 
+           class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-8 rounded-lg transition duration-200">
+            <i class="fas fa-redo mr-2"></i>Convert another
+        </a>
+    </div>
+</div>
+{% endblock %}

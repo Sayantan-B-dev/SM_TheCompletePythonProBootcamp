@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Upload PDF{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-gray-800 rounded-lg shadow-xl p-8 border border-gray-700">
+    <h1 class="text-3xl font-bold mb-6 text-white flex items-center">
+        <i class="fas fa-cloud-upload-alt mr-3 text-blue-400"></i>Upload PDF to Convert
+    </h1>
+    <p class="text-gray-400 mb-8">Select a PDF file and we'll convert it to speech using Google's free TTS.</p>
+    
+    <form action="{{ url_for('convert') }}" method="post" enctype="multipart/form-data">
+        <div class="mb-6">
+            <label class="block text-gray-300 text-sm font-medium mb-2" for="pdf_file">
+                <i class="fas fa-file-pdf mr-1 text-red-400"></i>Choose PDF file
+            </label>
+            <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" required
+                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                          file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                          file:text-sm file:font-semibold file:bg-blue-600 file:text-white
+                          hover:file:bg-blue-700 transition">
+        </div>
+        
+        <button type="submit" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg 
+                       transition duration-200 flex items-center justify-center space-x-2">
+            <i class="fas fa-play"></i>
+            <span>Convert to Audiobook</span>
+        </button>
+    </form>
+</div>
+{% endblock %}
