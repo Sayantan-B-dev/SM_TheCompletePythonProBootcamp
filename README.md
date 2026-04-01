@@ -12,6 +12,7 @@
 - > use `filecount.py` to count the number of files in the project.
 - > use `stat.py` to get the file and their total consumed storage stats.
 - > `python_file_tree.txt` contains all python project file location well structured
+- > `allmd.py`, recursively collects all `.md` files from the entire project into `AllMd/`, excludes junk/system directories like `.git`, `venv`, `node_modules`, etc, ignores any `README` files, and routes files containing `_ - _Coding_Exercise_` or `_ - _Assignment_` into `AllMd/exercises/` while handling duplicate filenames safely
 
 ---
 > Make sure to see the `full_folder_tree.txt` and `python_folder_tree.txt` to see overall file structure. 2nd one might help you with finding appropriate **python projects** that has been done in this repo.
